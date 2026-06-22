@@ -1,0 +1,66 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  role      Role     @default(ANGGOTA)
+  anggota   Anggota?
+  createdAt DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  ANGGOTA
+}
+
+model Anggota {
+  id         Int          @id @default(autoincrement())
+  userId     Int          @unique
+  user       User         @relation(fields: [userId], references: [id])
+  nama       String
+  nim        String       @unique
+  transaksi  Transaksi[]
+  createdAt  DateTime     @default(now())
+}
+
+model Buku {
+  id        Int         @id @default(autoincrement())
+  judul     String
+  pengarang String
+  kategori  String
+  stok      Int         @default(0)
+  transaksi Transaksi[]
+  createdAt DateTime    @default(now())
+}
+
+model Transaksi {
+  id            Int       @id @default(autoincrement())
+  anggotaId     Int
+  anggota       Anggota   @relation(fields: [anggotaId], references: [id])
+  bukuId        Int
+  buku          Buku      @relation(fields: [bukuId], references: [id])
+  tglPinjam     DateTime  @default(now())
+  batasKembali  DateTime
+  tglKembali    DateTime?
+  denda         Int       @default(0)
+  status        Status    @default(DIPINJAM)
+  createdAt     DateTime  @default(now())
+}
+
+enum Status {
+  DIPINJAM
+  SELESAI
+  TERLAMBAT
+}
