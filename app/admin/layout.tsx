@@ -22,7 +22,7 @@ export default function AdminLayout({
             {/* Sidebar */}
             <aside className="w-60 bg-white border-r flex flex-col p-4">
                 <h1 className="text-blue-600 font-bold text-lg mb-1">Perpustakaan UNAIR</h1>
-                <p className="text-xs text-gray-600 mb-6">Admin Dashboard</p>
+                <p className="text-xs text-black mb-6">Admin Dashboard</p>
                 <nav className="flex flex-col gap-2 flex-1">
                     {menus.map((menu) => (
                         <Link
@@ -30,7 +30,7 @@ export default function AdminLayout({
                             href={menu.href}
                             className={`px-3 py-2 rounded text-sm ${pathname === menu.href
                                 ? "text-blue-600 border-l-4 border-blue-600 font-semibold"
-                                : "text-gray-700 hover:bg-gray-100"
+                                : "text-black hover:bg-gray-100"
                                 }`}
                         >
                             {menu.label}
@@ -39,7 +39,7 @@ export default function AdminLayout({
                 </nav>
                 <button
                     onClick={() => signOut({ callbackUrl: "/login" })}
-                    className="text-sm text-gray-700 hover:text-red-500 text-left px-3 py-2"
+                    className="text-sm text-black hover:text-red-500 text-left px-3 py-2"
                 >
                     Logout
                 </button>

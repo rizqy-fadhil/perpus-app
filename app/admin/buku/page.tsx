@@ -57,8 +57,8 @@ return (
         + Tambah Buku Baru
         </Link>
     </div>
-    <table className="w-full bg-white rounded shadow text-sm">
-        <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
+    <table className="w-full bg-white rounded shadow text-sm text-black">
+        <thead className="bg-gray-100 text-black uppercase text-xs">
         <tr>
             <th className="p-3 text-left">ID</th>
             <th className="p-3 text-left">Judul Buku</th>

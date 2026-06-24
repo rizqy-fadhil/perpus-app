@@ -51,7 +51,7 @@ export default function KatalogBuku() {
     <div>
       <div className="bg-blue-50 rounded-xl p-10 text-center mb-8">
         <h1 className="text-3xl font-bold mb-2">Temukan Buku Favoritmu Hari Ini</h1>
-        <p className="text-gray-700 mb-6">
+        <p className="text-black mb-6">
           Jelajahi ribuan koleksi literatur, jurnal, dan referensi akademik.
         </p>
         <div className="flex justify-center">
@@ -71,13 +71,13 @@ export default function KatalogBuku() {
       <div className="grid grid-cols-4 gap-4">
         {filtered.map((buku) => (
           <div key={buku.id} className="bg-white rounded shadow p-4">
-            <span className="text-xs text-gray-700">{buku.kategori}</span>
+            <span className="text-xs text-black">{buku.kategori}</span>
             <div className="bg-blue-100 h-32 rounded my-2" />
             <h3 className="font-semibold text-sm">{buku.judul}</h3>
-            <p className="text-xs text-gray-700 mb-1">{buku.pengarang}</p>
+            <p className="text-xs text-black mb-1">{buku.pengarang}</p>
             <p
               className={`text-xs mb-3 ${
-                buku.stok > 0 ? "text-gray-700" : "text-red-500"
+                buku.stok > 0 ? "text-black" : "text-red-500"
               }`}
             >
               Stok: {buku.stok > 0 ? buku.stok : "Habis"}

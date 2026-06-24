@@ -18,7 +18,7 @@ export default async function LaporanTransaksi() {
       <div className="bg-white rounded shadow">
         <div className="flex justify-between items-center p-4 border-b">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-700">Periode:</span>
+            <span className="text-sm text-black">Periode:</span>
             <select className="border px-2 py-1 rounded text-sm">
               <option>Semua Waktu</option>
             </select>
@@ -27,8 +27,8 @@ export default async function LaporanTransaksi() {
             🖨️ Print / Cetak Laporan
           </button>
         </div>
-        <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
+        <table className="w-full text-sm text-black">
+          <thead className="bg-gray-50 text-black uppercase text-xs">
             <tr>
               <th className="p-3 text-left">ID Transaksi</th>
               <th className="p-3 text-left">Nama Anggota</th>
