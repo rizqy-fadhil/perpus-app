@@ -25,15 +25,15 @@ export default async function DashboardAdmin() {
       {/* Statistik */}
       <div className="grid grid-cols-3 gap-4 mb-8">
         <div className="bg-white rounded shadow p-6">
-          <p className="text-xs text-gray-500 uppercase mb-2">Total Koleksi Buku</p>
+          <p className="text-xs text-gray-700 uppercase mb-2">Total Koleksi Buku</p>
           <p className="text-4xl font-bold">{totalBuku}</p>
         </div>
         <div className="bg-white rounded shadow p-6">
-          <p className="text-xs text-gray-500 uppercase mb-2">Total Anggota Aktif</p>
+          <p className="text-xs text-gray-700 uppercase mb-2">Total Anggota Aktif</p>
           <p className="text-4xl font-bold">{totalAnggota}</p>
         </div>
         <div className="bg-white rounded shadow p-6">
-          <p className="text-xs text-gray-500 uppercase mb-2">Peminjaman Berjalan</p>
+          <p className="text-xs text-gray-700 uppercase mb-2">Peminjaman Berjalan</p>
           <p className="text-4xl font-bold">{peminjamaBerjalan}</p>
         </div>
       </div>
@@ -44,7 +44,7 @@ export default async function DashboardAdmin() {
           <h2 className="font-semibold">Riwayat Transaksi Terbaru</h2>
         </div>
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+          <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
             <tr>
               <th className="p-3 text-left">ID Transaksi</th>
               <th className="p-3 text-left">Nama Anggota</th>

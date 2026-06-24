@@ -94,7 +94,7 @@ export default function PendaftaranAnggota() {
         <div className="flex justify-end gap-2">
           <button
             onClick={() => setForm({ nama: "", nim: "", email: "", password: "" })}
-            className="border px-4 py-2 rounded text-gray-600"
+            className="border px-4 py-2 rounded text-gray-700"
           >
             Batal
           </button>
@@ -110,7 +110,7 @@ export default function PendaftaranAnggota() {
       {/* Tabel Anggota */}
       <h2 className="text-lg font-semibold mb-3">Daftar Anggota</h2>
       <table className="w-full bg-white rounded shadow text-sm">
-        <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+        <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
           <tr>
             <th className="p-3 text-left">ID</th>
             <th className="p-3 text-left">Nama</th>

@@ -18,7 +18,7 @@ export default async function LaporanTransaksi() {
       <div className="bg-white rounded shadow">
         <div className="flex justify-between items-center p-4 border-b">
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Periode:</span>
+            <span className="text-sm text-gray-700">Periode:</span>
             <select className="border px-2 py-1 rounded text-sm">
               <option>Semua Waktu</option>
             </select>
@@ -28,7 +28,7 @@ export default async function LaporanTransaksi() {
           </button>
         </div>
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+          <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
             <tr>
               <th className="p-3 text-left">ID Transaksi</th>
               <th className="p-3 text-left">Nama Anggota</th>

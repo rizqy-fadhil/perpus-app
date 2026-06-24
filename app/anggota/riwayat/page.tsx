@@ -50,7 +50,7 @@ export default function RiwayatDenda() {
           <div className="flex items-center gap-3">
             <span className="text-red-500 text-xl">⚠️</span>
             <div>
-              <p className="text-xs text-gray-500">STATUS DENDA</p>
+              <p className="text-xs text-gray-700">STATUS DENDA</p>
               <p className="font-semibold">
                 Total Tagihan Denda Anda Saat Ini:{" "}
                 <span className="text-red-500">
@@ -70,7 +70,7 @@ export default function RiwayatDenda() {
           <h2 className="font-semibold">Daftar Transaksi</h2>
         </div>
         <table className="w-full text-sm">
-          <thead className="bg-gray-50 text-gray-500 uppercase text-xs">
+          <thead className="bg-gray-50 text-gray-700 uppercase text-xs">
             <tr>
               <th className="p-3 text-left">ID Transaksi</th>
               <th className="p-3 text-left">Judul Buku</th>

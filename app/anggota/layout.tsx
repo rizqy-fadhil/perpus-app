@@ -31,7 +31,7 @@ export default function AnggotaLayout({
               className={`text-sm ${
                 pathname === menu.href
                   ? "text-blue-600 font-semibold border-b-2 border-blue-600"
-                  : "text-gray-600 hover:text-blue-600"
+                  : "text-gray-700 hover:text-blue-600"
               }`}
             >
               {menu.label}
@@ -40,7 +40,7 @@ export default function AnggotaLayout({
         </div>
         <button
           onClick={() => signOut({ callbackUrl: "/login" })}
-          className="text-sm text-gray-500 hover:text-red-500"
+          className="text-sm text-gray-700 hover:text-red-500"
         >
           Logout
         </button>

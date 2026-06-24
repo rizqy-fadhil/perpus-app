@@ -61,7 +61,7 @@ export default function TambahBuku() {
         <div className="flex justify-end gap-2">
           <button
             onClick={() => router.push("/admin/buku")}
-            className="border px-4 py-2 rounded text-gray-600"
+            className="border px-4 py-2 rounded text-gray-700"
           >
             Batal
           </button>

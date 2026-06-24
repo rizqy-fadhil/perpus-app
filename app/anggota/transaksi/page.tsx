@@ -83,7 +83,7 @@ export default function TransaksiPage() {
       <h1 className="text-2xl font-bold text-center mb-2">
         Sirkulasi Perpustakaan
       </h1>
-      <p className="text-center text-gray-500 mb-6">
+      <p className="text-center text-gray-700 mb-6">
         Lakukan peminjaman atau pengembalian buku Anda di sini.
       </p>
 
@@ -100,7 +100,7 @@ export default function TransaksiPage() {
           className={`flex-1 py-3 text-sm font-medium ${
             tab === "pinjam"
               ? "border-b-2 border-blue-600 text-blue-600"
-              : "text-gray-500"
+              : "text-gray-700"
           }`}
         >
           PEMINJAMAN BUKU
@@ -110,7 +110,7 @@ export default function TransaksiPage() {
           className={`flex-1 py-3 text-sm font-medium ${
             tab === "kembali"
               ? "border-b-2 border-blue-600 text-blue-600"
-              : "text-gray-500"
+              : "text-gray-700"
           }`}
         >
           PENGEMBALIAN BUKU

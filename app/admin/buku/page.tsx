@@ -58,7 +58,7 @@ return (
         </Link>
     </div>
     <table className="w-full bg-white rounded shadow text-sm">
-        <thead className="bg-gray-100 text-gray-600 uppercase text-xs">
+        <thead className="bg-gray-100 text-gray-700 uppercase text-xs">
         <tr>
             <th className="p-3 text-left">ID</th>
             <th className="p-3 text-left">Judul Buku</th>

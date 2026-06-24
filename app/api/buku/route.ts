@@ -37,6 +37,11 @@ export async function PUT(req: NextRequest) {
 
 export async function DELETE(req: NextRequest) {
     const { id } = await req.json();
+
+    await prisma.transaksi.deleteMany({
+    where: { bukuId: id },
+});
+
     await prisma.buku.delete({ where: { id } });
     return NextResponse.json({ message: "Buku berhasil dihapus" });
 }
