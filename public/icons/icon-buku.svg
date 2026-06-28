@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Open book icon -->
+  <path d="M32 16C32 16 26 12 18 12C10 12 6 16 6 16V48C6 48 10 44 18 44C26 44 32 48 32 48V16Z" fill="white" opacity="0.9"/>
+  <path d="M32 16C32 16 38 12 46 12C54 12 58 16 58 16V48C58 48 54 44 46 44C38 44 32 48 32 48V16Z" fill="white" opacity="0.9"/>
+  <!-- Down arrow / bookmark accent -->
+  <path d="M28 24H36V36L32 32L28 36V24Z" fill="rgba(30,70,180,0.4)"/>
+</svg>
