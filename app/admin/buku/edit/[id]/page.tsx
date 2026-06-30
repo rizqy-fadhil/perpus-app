@@ -1,89 +1,13 @@
 "use client";
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-export default function EditBuku() {
-  const router = useRouter();
-  const { id } = useParams();
-  const [form, setForm] = useState({
-    judul: "",
-    pengarang: "",
-    kategori: "",
-    stok: 0,
-  });
+export default function EditBukuRedirect() {
+    const router = useRouter();
 
-  useEffect(() => {
-    fetch(`/api/buku/${id}`)
-      .then((res) => res.json())
-      .then((data) => setForm(data));
-  }, [id]);
+    useEffect(() => {
+        router.replace("/admin/buku");
+    }, [router]);
 
-  const handleSubmit = async () => {
-    await fetch("/api/buku", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: parseInt(id as string), ...form }),
-    });
-    router.push("/admin/buku");
-  };
-
-  return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6">Edit Buku</h1>
-      <div className="bg-white p-6 rounded shadow w-full max-w-lg">
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Judul Buku</label>
-          <input
-            type="text"
-            value={form.judul}
-            className="w-full border px-3 py-2 rounded"
-            onChange={(e) => setForm({ ...form, judul: e.target.value })}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Pengarang</label>
-          <input
-            type="text"
-            value={form.pengarang}
-            className="w-full border px-3 py-2 rounded"
-            onChange={(e) => setForm({ ...form, pengarang: e.target.value })}
-          />
-        </div>
-        <div className="mb-4">
-          <label className="block text-sm font-medium mb-1">Kategori</label>
-          <input
-            type="text"
-            value={form.kategori}
-            className="w-full border px-3 py-2 rounded"
-            onChange={(e) => setForm({ ...form, kategori: e.target.value })}
-          />
-        </div>
-        <div className="mb-6">
-          <label className="block text-sm font-medium mb-1">Stok</label>
-          <input
-            type="number"
-            value={form.stok}
-            className="w-full border px-3 py-2 rounded"
-            onChange={(e) =>
-              setForm({ ...form, stok: parseInt(e.target.value) })
-            }
-          />
-        </div>
-        <div className="flex justify-end gap-2">
-          <button
-            onClick={() => router.push("/admin/buku")}
-            className="border px-4 py-2 rounded text-black"
-          >
-            Batal
-          </button>
-          <button
-            onClick={handleSubmit}
-            className="bg-blue-600 text-white px-4 py-2 rounded"
-          >
-            Simpan Perubahan
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+    return null;
 }
