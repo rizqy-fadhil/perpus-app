@@ -10,6 +10,10 @@ type Buku = {
   stok: number;
 };
 
+type TransaksiAktif = {
+  bukuId: number;
+};
+
 // Category color mapping for badges
 const kategoriColors: Record<string, { bg: string; text: string }> = {
   Pemrograman: { bg: "bg-blue-100", text: "text-blue-700" },
@@ -33,17 +37,149 @@ function getRating(id: number) {
   return ratings[id % ratings.length];
 }
 
+// Success Modal Component
+function SuccessModal({
+  isOpen,
+  onClose,
+  bookTitle,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  bookTitle: string;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      {/* Modal */}
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-[modalIn_0.3s_ease-out]">
+        {/* Success Icon */}
+        <div className="mx-auto w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-5">
+          <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        {/* Title */}
+        <h3 className="text-xl font-bold text-gray-900 mb-2">
+          Peminjaman Berhasil! 🎉
+        </h3>
+        {/* Description */}
+        <p className="text-sm text-gray-500 mb-2">
+          Anda telah berhasil meminjam buku:
+        </p>
+        <p className="text-sm font-semibold text-blue-700 bg-blue-50 rounded-lg px-4 py-2 mb-4 inline-block">
+          {bookTitle}
+        </p>
+        <p className="text-xs text-gray-400 mb-6">
+          Batas pengembalian: <span className="font-medium text-gray-600">7 hari</span> dari sekarang. Keterlambatan akan dikenakan denda.
+        </p>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+        >
+          Mengerti
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Error Modal Component
+function ErrorModal({
+  isOpen,
+  onClose,
+  message,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  message: string;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-[modalIn_0.3s_ease-out]">
+        <div className="mx-auto w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-5">
+          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">
+          Peminjaman Gagal
+        </h3>
+        <p className="text-sm text-gray-500 mb-6">
+          {message}
+        </p>
+        <button
+          onClick={onClose}
+          className="w-full bg-gray-800 hover:bg-gray-900 text-white py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function KatalogBuku() {
   const { data: session } = useSession();
   const [bukuList, setBukuList] = useState<Buku[]>([]);
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
+  const [borrowedBookIds, setBorrowedBookIds] = useState<Set<number>>(new Set());
+  const [loadingBookId, setLoadingBookId] = useState<number | null>(null);
 
-  useEffect(() => {
+  // Modal states
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [successBookTitle, setSuccessBookTitle] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const fetchData = () => {
     fetch("/api/buku")
       .then((res) => res.json())
       .then((data) => setBukuList(data));
+  };
+
+  const fetchBorrowedBooks = () => {
+    if (!session?.user?.email) return;
+    fetch("/api/anggota")
+      .then((res) => res.json())
+      .then((anggotaList) => {
+        const anggota = anggotaList.find(
+          (a: any) => a.user.email === session?.user?.email
+        );
+        if (!anggota) return;
+        fetch(`/api/transaksi?anggotaId=${anggota.id}`)
+          .then((res) => res.json())
+          .then((data) => {
+            const activeIds = new Set<number>(
+              data
+                .filter((t: any) => t.status === "DIPINJAM")
+                .map((t: any) => t.bukuId)
+            );
+            setBorrowedBookIds(activeIds);
+          });
+      });
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
+
+  useEffect(() => {
+    fetchBorrowedBooks();
+  }, [session]);
 
   const filtered = bukuList.filter(
     (b) =>
@@ -53,28 +189,60 @@ export default function KatalogBuku() {
 
   const displayed = showAll ? filtered : filtered.slice(0, 4);
 
-  const handlePinjam = async (bukuId: number) => {
+  const handlePinjam = async (buku: Buku) => {
     const res = await fetch("/api/anggota");
     const anggotaList = await res.json();
     const anggota = anggotaList.find(
       (a: any) => a.user.email === session?.user?.email
     );
-    if (!anggota) return alert("Data anggota tidak ditemukan");
+    if (!anggota) {
+      setErrorMessage("Data anggota tidak ditemukan.");
+      setShowError(true);
+      return;
+    }
 
-    await fetch("/api/transaksi", {
+    setLoadingBookId(buku.id);
+
+    const result = await fetch("/api/transaksi", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ anggotaId: anggota.id, bukuId }),
+      body: JSON.stringify({ anggotaId: anggota.id, bukuId: buku.id }),
     });
 
-    alert("Peminjaman berhasil!");
-    fetch("/api/buku")
-      .then((res) => res.json())
-      .then((data) => setBukuList(data));
+    setLoadingBookId(null);
+
+    if (!result.ok) {
+      const data = await result.json();
+      setErrorMessage(data.error || "Terjadi kesalahan saat meminjam buku.");
+      setShowError(true);
+      return;
+    }
+
+    // Success
+    setSuccessBookTitle(buku.judul);
+    setShowSuccess(true);
+    fetchData();
+    fetchBorrowedBooks();
   };
+
+  const isBorrowed = (bukuId: number) => borrowedBookIds.has(bukuId);
 
   return (
     <div>
+      {/* Success Modal */}
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        bookTitle={successBookTitle}
+      />
+
+      {/* Error Modal */}
+      <ErrorModal
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
+      />
+
       {/* Hero Section */}
       <div className="bg-gradient-to-b from-blue-50 to-white rounded-2xl px-10 pt-12 pb-10 text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">
@@ -146,10 +314,17 @@ export default function KatalogBuku() {
         {displayed.map((buku) => {
           const color = getKategoriColor(buku.kategori);
           const rating = getRating(buku.id);
+          const borrowed = isBorrowed(buku.id);
+          const outOfStock = buku.stok === 0;
+          const isDisabled = borrowed || outOfStock;
+          const isLoading = loadingBookId === buku.id;
+
           return (
             <div
               key={buku.id}
-              className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col"
+              className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col ${
+                borrowed ? "border-amber-200 ring-1 ring-amber-100" : "border-gray-100"
+              }`}
             >
               {/* Book Cover */}
               <div className="relative bg-gradient-to-br from-blue-50 to-slate-100 h-40 flex items-center justify-center">
@@ -159,6 +334,15 @@ export default function KatalogBuku() {
                 >
                   {buku.kategori}
                 </span>
+                {/* Borrowed Badge */}
+                {borrowed && (
+                  <span className="absolute top-3 right-3 text-xs font-medium px-2.5 py-1 rounded-md bg-amber-100 text-amber-700 flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                    </svg>
+                    Dipinjam
+                  </span>
+                )}
                 <svg className="w-12 h-12 text-gray-300" fill="none" stroke="currentColor" strokeWidth={1} viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                 </svg>
@@ -198,15 +382,34 @@ export default function KatalogBuku() {
 
                 {/* Pinjam Button */}
                 <button
-                  onClick={() => handlePinjam(buku.id)}
-                  disabled={buku.stok === 0}
+                  onClick={() => handlePinjam(buku)}
+                  disabled={isDisabled || isLoading}
                   className={`w-full text-sm py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors ${
-                    buku.stok > 0
+                    isLoading
+                      ? "bg-blue-400 text-white cursor-wait"
+                      : borrowed
+                      ? "bg-amber-50 text-amber-600 cursor-not-allowed border border-amber-200"
+                      : buku.stok > 0
                       ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
                       : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
                   }`}
                 >
-                  {buku.stok > 0 ? (
+                  {isLoading ? (
+                    <>
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      </svg>
+                      Memproses...
+                    </>
+                  ) : borrowed ? (
+                    <>
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clipRule="evenodd" />
+                      </svg>
+                      Sudah Dipinjam
+                    </>
+                  ) : buku.stok > 0 ? (
                     <>
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 21L3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" />
@@ -214,7 +417,7 @@ export default function KatalogBuku() {
                       Pinjam Buku
                     </>
                   ) : (
-                    "Sedang Dipinjam"
+                    "Stok Habis"
                   )}
                 </button>
               </div>
@@ -222,6 +425,20 @@ export default function KatalogBuku() {
           );
         })}
       </div>
+
+      {/* CSS Animation for Modal */}
+      <style jsx global>{`
+        @keyframes modalIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

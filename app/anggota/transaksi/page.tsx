@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 type Buku = { id: number; judul: string; stok: number };
 type Transaksi = {
   id: number;
+  bukuId: number;
   buku: { judul: string };
   tglPinjam: string;
   batasKembali: string;
@@ -49,6 +50,81 @@ function InfoIcon({ className = "w-5 h-5" }: { className?: string }) {
   );
 }
 
+// Success Modal Component
+function SuccessModal({
+  isOpen,
+  onClose,
+  title,
+  message,
+  detail,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  title: string;
+  message: string;
+  detail?: string;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-[modalIn_0.3s_ease-out]">
+        <div className="mx-auto w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mb-5">
+          <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+        <p className="text-sm text-gray-500 mb-2">{message}</p>
+        {detail && (
+          <p className="text-xs text-gray-400 mb-6">{detail}</p>
+        )}
+        <button
+          onClick={onClose}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+        >
+          Mengerti
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// Error Modal Component
+function ErrorModal({
+  isOpen,
+  onClose,
+  message,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  message: string;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 text-center animate-[modalIn_0.3s_ease-out]">
+        <div className="mx-auto w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mb-5">
+          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+          </svg>
+        </div>
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Gagal</h3>
+        <p className="text-sm text-gray-500 mb-6">{message}</p>
+        <button
+          onClick={onClose}
+          className="w-full bg-gray-800 hover:bg-gray-900 text-white py-3 rounded-xl text-sm font-semibold transition-colors shadow-sm"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function TransaksiPage() {
   const { data: session } = useSession();
   const [tab, setTab] = useState<"pinjam" | "kembali">("pinjam");
@@ -57,7 +133,25 @@ export default function TransaksiPage() {
   const [anggotaId, setAnggotaId] = useState<number | null>(null);
   const [selectedBuku, setSelectedBuku] = useState("");
   const [selectedTransaksi, setSelectedTransaksi] = useState("");
-  const [pesan, setPesan] = useState("");
+  const [borrowedBookIds, setBorrowedBookIds] = useState<Set<number>>(new Set());
+
+  // Modal states
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [successTitle, setSuccessTitle] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [successDetail, setSuccessDetail] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const fetchTransaksiAktif = (id: number) => {
+    fetch(`/api/transaksi?anggotaId=${id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const aktif = data.filter((t: any) => t.status === "DIPINJAM");
+        setTransaksiAktif(aktif);
+        setBorrowedBookIds(new Set(aktif.map((t: any) => t.bukuId)));
+      });
+  };
 
   useEffect(() => {
     if (!session) return;
@@ -73,34 +167,58 @@ export default function TransaksiPage() {
         );
         if (!anggota) return;
         setAnggotaId(anggota.id);
-        fetch(`/api/transaksi?anggotaId=${anggota.id}`)
-          .then((r) => r.json())
-          .then((data) =>
-            setTransaksiAktif(data.filter((t: any) => t.status === "DIPINJAM"))
-          );
+        fetchTransaksiAktif(anggota.id);
       });
   }, [session]);
 
   const handlePinjam = async () => {
     if (!selectedBuku || !anggotaId) return;
-    await fetch("/api/transaksi", {
+
+    const result = await fetch("/api/transaksi", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ anggotaId, bukuId: parseInt(selectedBuku) }),
     });
-    setPesan("Peminjaman berhasil!");
+
+    if (!result.ok) {
+      const data = await result.json();
+      setErrorMessage(data.error || "Terjadi kesalahan saat meminjam buku.");
+      setShowError(true);
+      return;
+    }
+
+    const bukuTerpilih = bukuList.find((b) => b.id === parseInt(selectedBuku));
+    setSuccessTitle("Peminjaman Berhasil! 🎉");
+    setSuccessMessage(`Anda telah berhasil meminjam buku "${bukuTerpilih?.judul || ""}".`);
+    setSuccessDetail("Batas pengembalian: 7 hari dari sekarang. Keterlambatan akan dikenakan denda.");
+    setShowSuccess(true);
     setSelectedBuku("");
+
+    // Refresh data
+    fetch("/api/buku").then((r) => r.json()).then(setBukuList);
+    fetchTransaksiAktif(anggotaId);
   };
 
   const handleKembali = async () => {
-    if (!selectedTransaksi) return;
+    if (!selectedTransaksi || !anggotaId) return;
+
+    const trx = transaksiAktif.find((t) => t.id === parseInt(selectedTransaksi));
+
     await fetch("/api/transaksi", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: parseInt(selectedTransaksi) }),
     });
-    setPesan("Pengembalian berhasil!");
+
+    setSuccessTitle("Pengembalian Berhasil! 📚");
+    setSuccessMessage(`Buku "${trx?.buku.judul || ""}" telah berhasil dikembalikan.`);
+    setSuccessDetail("Terima kasih telah mengembalikan buku tepat waktu.");
+    setShowSuccess(true);
     setSelectedTransaksi("");
+
+    // Refresh data
+    fetch("/api/buku").then((r) => r.json()).then(setBukuList);
+    fetchTransaksiAktif(anggotaId);
   };
 
   const tglHariIni = new Date().toLocaleDateString("id-ID", {
@@ -141,8 +259,27 @@ export default function TransaksiPage() {
   };
   const lateInfo = getLateInfo();
 
+  // Filter out books that user has already borrowed
+  const availableBuku = bukuList.filter(
+    (b) => b.stok > 0 && !borrowedBookIds.has(b.id)
+  );
+
   return (
     <div className="max-w-2xl mx-auto pt-4">
+      {/* Modals */}
+      <SuccessModal
+        isOpen={showSuccess}
+        onClose={() => setShowSuccess(false)}
+        title={successTitle}
+        message={successMessage}
+        detail={successDetail}
+      />
+      <ErrorModal
+        isOpen={showError}
+        onClose={() => setShowError(false)}
+        message={errorMessage}
+      />
+
       {/* Header */}
       <h1 className="text-3xl font-bold text-center mb-2 text-gray-900 tracking-tight">
         Sirkulasi Perpustakaan
@@ -151,20 +288,12 @@ export default function TransaksiPage() {
         Lakukan peminjaman atau pengembalian buku Anda di sini.
       </p>
 
-      {/* Success Message */}
-      {pesan && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 text-sm flex items-center gap-2">
-          <CheckCircleIcon className="w-5 h-5 text-green-500 flex-shrink-0" />
-          {pesan}
-        </div>
-      )}
-
       {/* Card Container */}
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
         {/* Tabs */}
         <div className="flex border-b border-gray-200">
           <button
-            onClick={() => { setTab("pinjam"); setPesan(""); }}
+            onClick={() => { setTab("pinjam"); }}
             className={`flex-1 py-4 text-sm font-semibold tracking-wide uppercase transition-colors ${
               tab === "pinjam"
                 ? "text-blue-600 border-b-[3px] border-blue-600 bg-white"
@@ -174,7 +303,7 @@ export default function TransaksiPage() {
             Peminjaman Buku
           </button>
           <button
-            onClick={() => { setTab("kembali"); setPesan(""); }}
+            onClick={() => { setTab("kembali"); }}
             className={`flex-1 py-4 text-sm font-semibold tracking-wide uppercase transition-colors ${
               tab === "kembali"
                 ? "text-blue-600 border-b-[3px] border-blue-600 bg-white"
@@ -204,13 +333,11 @@ export default function TransaksiPage() {
                     className="w-full border border-gray-200 pl-10 pr-10 py-3 rounded-xl text-sm bg-white appearance-none focus:outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 transition text-gray-700"
                   >
                     <option value="">Pilih judul buku dari katalog...</option>
-                    {bukuList
-                      .filter((b) => b.stok > 0)
-                      .map((b) => (
-                        <option key={b.id} value={b.id}>
-                          {b.judul}
-                        </option>
-                      ))}
+                    {availableBuku.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.judul}
+                      </option>
+                    ))}
                   </select>
                   <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
                     <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -218,6 +345,15 @@ export default function TransaksiPage() {
                     </svg>
                   </div>
                 </div>
+                {/* Currently borrowed notice */}
+                {borrowedBookIds.size > 0 && (
+                  <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">
+                    <svg className="w-3.5 h-3.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0110 5zm0 9a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                    </svg>
+                    Buku yang sudah Anda pinjam tidak ditampilkan dalam daftar.
+                  </p>
+                )}
               </div>
 
               {/* Date Fields */}
@@ -369,6 +505,20 @@ export default function TransaksiPage() {
           )}
         </div>
       </div>
+
+      {/* CSS Animation for Modal */}
+      <style jsx global>{`
+        @keyframes modalIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

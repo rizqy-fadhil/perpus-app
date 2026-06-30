@@ -22,6 +22,22 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const body = await req.json();
 
+  // Check if user already has an active borrow for the same book
+  const existingBorrow = await prisma.transaksi.findFirst({
+    where: {
+      anggotaId: body.anggotaId,
+      bukuId: body.bukuId,
+      status: "DIPINJAM",
+    },
+  });
+
+  if (existingBorrow) {
+    return NextResponse.json(
+      { error: "Anda sudah meminjam buku ini. Kembalikan terlebih dahulu sebelum meminjam lagi." },
+      { status: 400 }
+    );
+  }
+
   const tglPinjam = new Date();
   const batasKembali = new Date();
   batasKembali.setDate(tglPinjam.getDate() + BATAS_HARI);
