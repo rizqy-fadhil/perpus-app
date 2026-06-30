@@ -66,7 +66,7 @@ function SuccessModal({
         </div>
         {/* Title */}
         <h3 className="text-xl font-bold text-gray-900 mb-2">
-          Peminjaman Berhasil! 🎉
+          Peminjaman Berhasil!
         </h3>
         {/* Description */}
         <p className="text-sm text-gray-500 mb-2">
@@ -322,9 +322,8 @@ export default function KatalogBuku() {
           return (
             <div
               key={buku.id}
-              className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col ${
-                borrowed ? "border-amber-200 ring-1 ring-amber-100" : "border-gray-100"
-              }`}
+              className={`bg-white rounded-xl border shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col ${borrowed ? "border-amber-200 ring-1 ring-amber-100" : "border-gray-100"
+                }`}
             >
               {/* Book Cover */}
               <div className="relative bg-gradient-to-br from-blue-50 to-slate-100 h-40 flex items-center justify-center">
@@ -384,15 +383,14 @@ export default function KatalogBuku() {
                 <button
                   onClick={() => handlePinjam(buku)}
                   disabled={isDisabled || isLoading}
-                  className={`w-full text-sm py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors ${
-                    isLoading
-                      ? "bg-blue-400 text-white cursor-wait"
-                      : borrowed
+                  className={`w-full text-sm py-2.5 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors ${isLoading
+                    ? "bg-blue-400 text-white cursor-wait"
+                    : borrowed
                       ? "bg-amber-50 text-amber-600 cursor-not-allowed border border-amber-200"
                       : buku.stok > 0
-                      ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
-                      : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
-                  }`}
+                        ? "bg-blue-600 text-white hover:bg-blue-700 shadow-sm"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed border border-gray-200"
+                    }`}
                 >
                   {isLoading ? (
                     <>

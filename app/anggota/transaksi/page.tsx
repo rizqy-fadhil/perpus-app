@@ -188,7 +188,7 @@ export default function TransaksiPage() {
     }
 
     const bukuTerpilih = bukuList.find((b) => b.id === parseInt(selectedBuku));
-    setSuccessTitle("Peminjaman Berhasil! 🎉");
+    setSuccessTitle("Peminjaman Berhasil!");
     setSuccessMessage(`Anda telah berhasil meminjam buku "${bukuTerpilih?.judul || ""}".`);
     setSuccessDetail("Batas pengembalian: 7 hari dari sekarang. Keterlambatan akan dikenakan denda.");
     setShowSuccess(true);
@@ -294,21 +294,19 @@ export default function TransaksiPage() {
         <div className="flex border-b border-gray-200">
           <button
             onClick={() => { setTab("pinjam"); }}
-            className={`flex-1 py-4 text-sm font-semibold tracking-wide uppercase transition-colors ${
-              tab === "pinjam"
-                ? "text-blue-600 border-b-[3px] border-blue-600 bg-white"
-                : "text-gray-400 hover:text-gray-600 bg-gray-50/50"
-            }`}
+            className={`flex-1 py-4 text-sm font-semibold tracking-wide uppercase transition-colors ${tab === "pinjam"
+              ? "text-blue-600 border-b-[3px] border-blue-600 bg-white"
+              : "text-gray-400 hover:text-gray-600 bg-gray-50/50"
+              }`}
           >
             Peminjaman Buku
           </button>
           <button
             onClick={() => { setTab("kembali"); }}
-            className={`flex-1 py-4 text-sm font-semibold tracking-wide uppercase transition-colors ${
-              tab === "kembali"
-                ? "text-blue-600 border-b-[3px] border-blue-600 bg-white"
-                : "text-gray-400 hover:text-gray-600 bg-gray-50/50"
-            }`}
+            className={`flex-1 py-4 text-sm font-semibold tracking-wide uppercase transition-colors ${tab === "kembali"
+              ? "text-blue-600 border-b-[3px] border-blue-600 bg-white"
+              : "text-gray-400 hover:text-gray-600 bg-gray-50/50"
+              }`}
           >
             Pengembalian Buku
           </button>
@@ -392,11 +390,10 @@ export default function TransaksiPage() {
                 <button
                   onClick={handlePinjam}
                   disabled={!selectedBuku}
-                  className={`flex items-center gap-2 px-8 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                    selectedBuku
-                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                      : "bg-blue-200 text-blue-50 cursor-not-allowed"
-                  }`}
+                  className={`flex items-center gap-2 px-8 py-2.5 rounded-lg text-sm font-semibold transition-all ${selectedBuku
+                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    : "bg-blue-200 text-blue-50 cursor-not-allowed"
+                    }`}
                 >
                   <CheckCircleIcon className="w-5 h-5" />
                   Pinjam
@@ -453,22 +450,20 @@ export default function TransaksiPage() {
                     Status Keterlambatan
                   </label>
                   <div
-                    className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${
-                      !selectedTransaksi
-                        ? "bg-gray-50 border-gray-100"
-                        : lateInfo?.late
+                    className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${!selectedTransaksi
+                      ? "bg-gray-50 border-gray-100"
+                      : lateInfo?.late
                         ? "bg-red-50/70 border-red-100"
                         : "bg-green-50/70 border-green-100"
-                    }`}
+                      }`}
                   >
                     <span
-                      className={`text-sm font-medium ${
-                        !selectedTransaksi
-                          ? "text-gray-400"
-                          : lateInfo?.late
+                      className={`text-sm font-medium ${!selectedTransaksi
+                        ? "text-gray-400"
+                        : lateInfo?.late
                           ? "text-red-500"
                           : "text-green-600"
-                      }`}
+                        }`}
                     >
                       {!selectedTransaksi
                         ? "Pilih buku terlebih dahulu"
@@ -491,11 +486,10 @@ export default function TransaksiPage() {
                 <button
                   onClick={handleKembali}
                   disabled={!selectedTransaksi}
-                  className={`flex items-center gap-2 px-8 py-2.5 rounded-lg text-sm font-semibold transition-all ${
-                    selectedTransaksi
-                      ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
-                      : "bg-blue-200 text-blue-50 cursor-not-allowed"
-                  }`}
+                  className={`flex items-center gap-2 px-8 py-2.5 rounded-lg text-sm font-semibold transition-all ${selectedTransaksi
+                    ? "bg-blue-600 hover:bg-blue-700 text-white shadow-sm"
+                    : "bg-blue-200 text-blue-50 cursor-not-allowed"
+                    }`}
                 >
                   <CheckCircleIcon className="w-5 h-5" />
                   Kembalikan
