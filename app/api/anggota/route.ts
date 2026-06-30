@@ -31,7 +31,28 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
-  await prisma.anggota.delete({ where: { id } });
-  return NextResponse.json({ message: "Anggota berhasil dihapus" });
+  try {
+    const { id } = await req.json();
+
+    // Cari anggota dan periksa apakah ada
+    const anggota = await prisma.anggota.findUnique({ where: { id } });
+    if (!anggota) {
+      return NextResponse.json({ error: "Anggota tidak ditemukan" }, { status: 404 });
+    }
+
+    // Periksa apakah anggota memiliki transaksi yang terkait
+    const transaksi = await prisma.transaksi.findFirst({ where: { anggotaId: id } });
+    if (transaksi) {
+      return NextResponse.json({ error: "Anggota memiliki riwayat transaksi dan tidak dapat dihapus." }, { status: 400 });
+    }
+
+    // Hapus anggota terlebih dahulu karena ada foreign key di transaksi,
+    // lalu hapus user karena user adalah entitas utama (meskipun anggota punya userId, tapi relasinya onDelete Restrict default).
+    await prisma.anggota.delete({ where: { id } });
+    await prisma.user.delete({ where: { id: anggota.userId } });
+
+    return NextResponse.json({ message: "Anggota dan User berhasil dihapus" });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message || "Gagal menghapus anggota" }, { status: 500 });
+  }
 }
