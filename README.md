@@ -64,18 +64,22 @@ npm run dev
 Buka [http://localhost:3000](http://localhost:3000)
 
 ## 📁 Struktur Project
+
+```
 /perpus-app
 ├── app/
-│   ├── admin/          ← halaman admin (dashboard, buku, anggota, laporan)
-│   ├── anggota/        ← halaman anggota (katalog, transaksi, riwayat)
-│   ├── api/            ← API Routes (auth, buku, anggota, transaksi)
+│   ├── admin/          ← halaman admin
+│   ├── anggota/        ← halaman anggota
+│   ├── api/            ← API Routes
 │   └── login/          ← halaman login
 ├── lib/
 │   ├── prisma.ts       ← Prisma Client
 │   └── auth.ts         ← konfigurasi NextAuth
 ├── prisma/
 │   └── schema.prisma   ← skema database
-└── proxy.ts            ← proteksi rute berdasarkan role
+└── proxy.ts            ← proteksi rute
+```
+
 ## 👥 Tim Pengembang
 
 Tugas APSI — Kelas I2 — Universitas Airlangga
