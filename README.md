@@ -4,14 +4,13 @@ Sistem Informasi Peminjaman Buku Perpustakaan berbasis web yang dibangun menggun
 
 ## 🔗 Live Demo
 
-[https://perpus-app.vercel.app](https://perpus-app.vercel.app)
+[https://perpus-app-sable.vercel.app](https://perpus-app-sable.vercel.app)
 
 ## 🔑 Demo Login
 
 | Role | Email | Password |
 |------|-------|----------|
 | Admin | admin@perpus.com | password |
-| Anggota | rizqy@perpus.com | password |
 
 ## 🛠️ Tech Stack
 
